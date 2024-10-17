@@ -9,8 +9,10 @@
   "author": "dana,isa,meraym,mohamed",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "expess": "^0.0.1-security",
+    "express": "^4.21.1",
     "mongoose": "^8.7.1"
   }
 }
