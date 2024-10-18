@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const reviewSchema = new mongoose.Schema(
+const reviewSchema = mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Who rated the place/hotel
     place: { type: mongoose.Schema.Types.ObjectId, ref: 'Place' }, // Optional, depending on whether it's for a place or a hotel
@@ -18,4 +18,5 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-module.exports = mongoose.model('Review', reviewSchema)
+const Review = mongoose.model('Review', reviewSchema)
+module.exports = { Review }
