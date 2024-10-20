@@ -21,6 +21,7 @@ const db = require('./config/db')
 const AuthRouter = require('./routes/AuthRouter')
 const Place = require('./routes/Place')
 const Hotel = require('./routes/Hotel')
+
 // CORS Configuration
 app.use(cors())
 

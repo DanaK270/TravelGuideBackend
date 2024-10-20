@@ -1,4 +1,5 @@
 const { Place } = require('../models/Place')
+const { Country } = require('../models/Country')
 
 const GetPlace = async (req, res) => {
   try {
@@ -11,7 +12,12 @@ const GetPlace = async (req, res) => {
 
 const CreatePlace = async (req, res) => {
   try {
+    const { countryIds } = req.body
     const place = await Place.create({ ...req.body })
+    await Country.updateMany(
+      { _id: { $in: countryIds } },
+      { $push: { places: place._id } }
+    )
     res.send(place)
   } catch (error) {
     throw error

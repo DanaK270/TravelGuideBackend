@@ -1,4 +1,5 @@
 const { Hotel } = require('../models/Hotel')
+const { Country } = require('../models/Country')
 
 const GetHotel = async (req, res) => {
   try {
@@ -9,9 +10,14 @@ const GetHotel = async (req, res) => {
   }
 }
 
-const CreateHotel = async (req, res) => {
+const CreateHotelPost = async (req, res) => {
   try {
+    const { countryIds } = req.body
     const hotel = await Hotel.create({ ...req.body })
+    await Country.updateMany(
+      { _id: { $in: countryIds } },
+      { $push: { hotels: hotel._id } }
+    )
     res.send(hotel)
   } catch (error) {
     throw error
@@ -44,7 +50,7 @@ const DeleteHotel = async (req, res) => {
 
 module.exports = {
   GetHotel,
-  CreateHotel,
+  CreateHotelPost,
   UpdateHotel,
   DeleteHotel
 }
