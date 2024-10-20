@@ -29,8 +29,22 @@ const UpdatePlace = async (req, res) => {
   }
 }
 
+const DeletePlace = async (req, res) => {
+  try {
+    await Place.deleteOne({ _id: req.params.place_id })
+    res.send({
+      msg: 'Place Deleted',
+      payload: req.params.place_id,
+      status: 'Ok'
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   GetPlace,
   CreatePlace,
-  UpdatePlace
+  UpdatePlace,
+  DeletePlace
 }
