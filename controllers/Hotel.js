@@ -3,7 +3,7 @@ const { Country } = require('../models/Country')
 
 const GetHotel = async (req, res) => {
   try {
-    const hotel = await Hotel.find({})
+    const hotel = await Hotel.find()
     res.send(hotel)
   } catch (error) {
     throw error
@@ -11,16 +11,28 @@ const GetHotel = async (req, res) => {
 }
 
 const CreateHotelPost = async (req, res) => {
+  console.log(' CREATE: ', req.body)
+  console.log(req.file)
   try {
-    const { countryIds } = req.body
-    const hotel = await Hotel.create({ ...req.body })
-    await Country.updateMany(
-      { _id: { $in: countryIds } },
-      { $push: { hotels: hotel._id } }
-    )
+    const imageName = req.file.filename
+    let hotelData = {
+      ...req.body,
+      image: imageName
+    }
+    let hotel = new Hotel(hotelData)
+    hotel.save()
+
+    // Find the relevant country and update its hotels array
+    let countryObj = await Country.findById(req.body.country)
+    if (countryObj) {
+      countryObj.hotels.push(hotel._id) // Add the new hotel's ID to the country's hotels array
+      await countryObj.save() // Save the updated country
+    }
+
     res.send(hotel)
   } catch (error) {
-    throw error
+    console.error('Error adding hotel:', error)
+    res.status(500).send('Error adding hotel')
   }
 }
 
