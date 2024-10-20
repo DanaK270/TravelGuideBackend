@@ -10,16 +10,18 @@ router.post(
   middleware.verifyToken,
   reviewsController.reviews_add_post
 )
-
-//delete
 router.delete(
   '/delete/:id',
   middleware.stripToken,
   middleware.verifyToken,
   reviewsController.reviews_delete
 )
-
-//get
 router.get('/view', reviewsController.reviews_view_get)
+router.put(
+  '/update/:id',
+  middleware.stripToken,
+  middleware.verifyToken,
+  reviewsController.review_update_put
+)
 
 module.exports = router
