@@ -29,8 +29,22 @@ const UpdateHotel = async (req, res) => {
   }
 }
 
+const DeleteHotel = async (req, res) => {
+  try {
+    await Hotel.deleteOne({ _id: req.params.hotel_id })
+    res.send({
+      msg: 'Hotel Deleted',
+      payload: req.params.hotel_id,
+      status: 'Ok'
+    })
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   GetHotel,
   CreateHotel,
-  UpdateHotel
+  UpdateHotel,
+  DeleteHotel
 }
