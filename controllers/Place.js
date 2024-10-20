@@ -11,27 +11,77 @@ const GetPlace = async (req, res) => {
 }
 
 const CreatePlace = async (req, res) => {
+  console.log(' CREATE: ', req.body)
+  console.log(req.file)
   try {
-    const { countryIds } = req.body
-    const place = await Place.create({ ...req.body })
-    await Country.updateMany(
-      { _id: { $in: countryIds } },
-      { $push: { places: place._id } }
-    )
+    const imageName = req.file.filename
+    let placeData = {
+      ...req.body,
+      image: imageName
+    }
+    let place = new Place(placeData)
+    place.save()
+
+    // Find the relevant country and update its places array
+    let countryObj = await Country.findById(req.body.country)
+    if (countryObj) {
+      countryObj.places.push(place._id) // Add the new place's ID to the country's places array
+      await countryObj.save() // Save the updated country
+    }
+
     res.send(place)
   } catch (error) {
-    throw error
+    console.error('Error adding place:', error)
+    res.status(500).send('Error adding place')
   }
 }
 
 const UpdatePlace = async (req, res) => {
   try {
-    const place = await Place.findByIdAndUpdate(req.params.place_id, req.body, {
-      new: true
-    })
+    const existingPlace = await Place.findById(req.params.place_id)
+
+    if (!existingPlace) {
+      return res.status(404).send('Place not found')
+    }
+
+    const newCountryId = req.body.country
+    const oldCountryId = existingPlace.country.toString()
+
+    let updatedData = req.body
+
+    if (req.file) {
+      updatedData.image = req.file.filename
+    }
+
+    const place = await Place.findByIdAndUpdate(
+      req.params.place_id,
+      updatedData,
+      {
+        new: true
+      }
+    )
+
+    // If the country has changed, update the relevant countries
+    if (newCountryId && newCountryId !== oldCountryId) {
+      // Remove the place from the old country
+      const oldCountry = await Country.findById(oldCountryId)
+      if (oldCountry) {
+        oldCountry.places.pull(place._id)
+        await oldCountry.save()
+      }
+
+      // Add the place to the new country
+      const newCountry = await Country.findById(newCountryId)
+      if (newCountry) {
+        newCountry.places.push(place._id)
+        await newCountry.save()
+      }
+    }
+
     res.send(place)
   } catch (error) {
-    throw error
+    console.log('Error updating place:', error)
+    res.status(500).send('Error updating place')
   }
 }
 
