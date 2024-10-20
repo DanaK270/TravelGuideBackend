@@ -1,16 +1,15 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose")
 
-const hotelSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true
+const hotelSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    location: String,
+    image: String,
+    country: { type: mongoose.Schema.Types.ObjectId, ref: "Country" },
+    link: String,
   },
-  location: String,
-  image: String,
-  country: { type: mongoose.Schema.Types.ObjectId, ref: 'Country' },
-  // ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
-  link: String
-})
+  { timestamps: true }
+)
 
-const Hotel = mongoose.model('Hotel', hotelSchema)
+const Hotel = mongoose.model("Hotel", hotelSchema)
 module.exports = { Hotel }

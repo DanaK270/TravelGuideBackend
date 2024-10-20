@@ -1,38 +1,60 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cors = require('cors')
-require('dotenv').config()
-//const path = require('path')
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const socketIO = require('socket.io');
+require('dotenv').config();
 
-// PORT Configuration
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 4000;
+const app = express();
 
-// Initialize Express
-const app = express()
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
-
-app.use(cors())
-
+// Database Connection
 const db = require('./config/db')
 
 // Import Routes
-const AuthRouter = require('./routes/AuthRouter')
-const Place = require('./routes/Place')
-const Hotel = require('./routes/Hotel')
-const ReviewRouter = require('./routes/review')
+const AuthRouter = require('./routes/AuthRouter');
+const PlaceRouter = require('./routes/Place');
+const HotelRouter = require('./routes/Hotel');
+const ReviewRouter = require('./routes/review');
+const BlogRouter = require('./routes/blogs');
+const ChatRouter = require('./routes/chats');
 
-// CORS Configuration
-app.use(cors())
+// Mount Routes
+app.use('/auth', AuthRouter);
+app.use('/place', PlaceRouter);
+app.use('/hotel', HotelRouter);
+app.use('/review', ReviewRouter);
+app.use('/blogs', BlogRouter);
+app.use('/chats', ChatRouter);
 
-// Mount Routes (after CORS)
-app.use('/auth', AuthRouter)
-app.use('/Place', Place)
-app.use('/Hotel', Hotel)
-app.use('/review', ReviewRouter)
+const server = app.listen(PORT, () => {
+  console.log(`App is running on PORT ${PORT}`);
+});
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`App is running on PORT ${PORT}`)
-})
+// Socket.IO for real-time chat
+const io = socketIO(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('message', async (msg) => {
+    const Message = require('./models/Message');
+    const message = new Message({ content: msg.content, user: msg.userId });
+    await message.save();
+
+    io.emit('message', message);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});

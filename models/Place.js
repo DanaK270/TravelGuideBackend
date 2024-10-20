@@ -1,17 +1,13 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const placeSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
+const placeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
   description: String,
   location: String,
   image: String,
   country: { type: mongoose.Schema.Types.ObjectId, ref: 'Country' },
-  // ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
-  link: String
-})
+  link: String,
+}, { timestamps: true });
 
-const Place = mongoose.model('Place', placeSchema)
-module.exports = { Place }
+const Place = mongoose.model('Place', placeSchema);
+module.exports = { Place };
