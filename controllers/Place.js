@@ -11,16 +11,28 @@ const GetPlace = async (req, res) => {
 }
 
 const CreatePlace = async (req, res) => {
+  console.log(' CREATE: ', req.body)
+  console.log(req.file)
   try {
-    const { countryIds } = req.body
-    const place = await Place.create({ ...req.body })
-    await Country.updateMany(
-      { _id: { $in: countryIds } },
-      { $push: { places: place._id } }
-    )
+    const imageName = req.file.filename
+    let placeData = {
+      ...req.body,
+      image: imageName
+    }
+    let place = new Place(placeData)
+    place.save()
+
+    // Find the relevant country and update its places array
+    let countryObj = await Country.findById(req.body.country)
+    if (countryObj) {
+      countryObj.places.push(place._id) // Add the new place's ID to the country's places array
+      await countryObj.save() // Save the updated country
+    }
+
     res.send(place)
   } catch (error) {
-    throw error
+    console.error('Error adding place:', error)
+    res.status(500).send('Error adding place')
   }
 }
 
