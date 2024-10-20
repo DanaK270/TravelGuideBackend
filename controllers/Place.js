@@ -18,7 +18,19 @@ const CreatePlace = async (req, res) => {
   }
 }
 
+const UpdatePlace = async (req, res) => {
+  try {
+    const place = await Place.findByIdAndUpdate(req.params.place_id, req.body, {
+      new: true
+    })
+    res.send(place)
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   GetPlace,
-  CreatePlace
+  CreatePlace,
+  UpdatePlace
 }
