@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const socketIO = require('socket.io');
 const BlogRouter = require('./routes/blog');
+const FlightRouter = require('./routes/Flight');
+const ChatRouter = require('./routes/chats');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 4000;
@@ -12,7 +14,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
-app.use('/blogs', BlogRouter);
 
 // Database Connection
 const db = require('./config/db')
@@ -30,6 +31,9 @@ app.use('/auth', AuthRouter);
 app.use('/place', PlaceRouter);
 app.use('/hotel', HotelRouter);
 app.use('/review', ReviewRouter);
+app.use('/blogs', BlogRouter);
+app.use('/chats', ChatRouter);
+app.use('/flight', FlightRouter);
 app.use('/blogs', BlogRouter);
 app.use('/chats', ChatRouter);
 
