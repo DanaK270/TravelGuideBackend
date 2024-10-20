@@ -19,13 +19,14 @@ const db = require('./config/db')
 
 // Import Routes
 const AuthRouter = require('./routes/AuthRouter')
+const CountryRouter = require('./routes/CountryRouter')
 
 // CORS Configuration
 app.use(cors())
 
 // Mount Routes (after CORS)
 app.use('/auth', AuthRouter)
-
+app.use('/country', CountryRouter)
 // Start server
 app.listen(PORT, () => {
   console.log(`App is running on PORT ${PORT}`)
