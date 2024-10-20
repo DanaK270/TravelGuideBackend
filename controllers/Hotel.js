@@ -38,12 +38,50 @@ const CreateHotelPost = async (req, res) => {
 
 const UpdateHotel = async (req, res) => {
   try {
-    const hotel = await Hotel.findByIdAndUpdate(req.params.hotel_id, req.body, {
-      new: true
-    })
+    const existingHotel = await Hotel.findById(req.params.hotel_id)
+
+    if (!existingHotel) {
+      return res.status(404).send('Hotel not found')
+    }
+
+    const newCountryId = req.body.country
+    const oldCountryId = existingHotel.country.toString()
+
+    let updatedData = req.body
+
+    if (req.file) {
+      updatedData.image = req.file.filename
+    }
+
+    const hotel = await Hotel.findByIdAndUpdate(
+      req.params.hotel_id,
+      updatedData,
+      {
+        new: true
+      }
+    )
+
+    // If the country has changed, update the relevant countries
+    if (newCountryId && newCountryId !== oldCountryId) {
+      // Remove the hotel from the old country
+      const oldCountry = await Country.findById(oldCountryId)
+      if (oldCountry) {
+        oldCountry.hotels.pull(hotel._id)
+        await oldCountry.save()
+      }
+
+      // Add the hotel to the new country
+      const newCountry = await Country.findById(newCountryId)
+      if (newCountry) {
+        newCountry.hotels.push(hotel._id)
+        await newCountry.save()
+      }
+    }
+
     res.send(hotel)
   } catch (error) {
-    throw error
+    console.log('Error updating hotel:', error)
+    res.status(500).send('Error updating hotel')
   }
 }
 
