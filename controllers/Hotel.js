@@ -18,7 +18,19 @@ const CreateHotel = async (req, res) => {
   }
 }
 
+const UpdateHotel = async (req, res) => {
+  try {
+    const hotel = await Hotel.findByIdAndUpdate(req.params.hotel_id, req.body, {
+      new: true
+    })
+    res.send(hotel)
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   GetHotel,
-  CreateHotel
+  CreateHotel,
+  UpdateHotel
 }
