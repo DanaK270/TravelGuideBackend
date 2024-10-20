@@ -9,6 +9,16 @@ const GetPlace = async (req, res) => {
   }
 }
 
+const CreatePlace = async (req, res) => {
+  try {
+    const place = await Place.create({ ...req.body })
+    res.send(place)
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
-  GetPlace
+  GetPlace,
+  CreatePlace
 }
