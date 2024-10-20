@@ -9,6 +9,16 @@ const GetHotel = async (req, res) => {
   }
 }
 
+const CreateHotel = async (req, res) => {
+  try {
+    const hotel = await Hotel.create({ ...req.body })
+    res.send(hotel)
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
-  GetHotel
+  GetHotel,
+  CreateHotel
 }
