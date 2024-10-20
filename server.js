@@ -20,13 +20,14 @@ const db = require('./config/db')
 // Import Routes
 const AuthRouter = require('./routes/AuthRouter')
 const Place = require('./routes/Place')
-
+const Hotel = require('./routes/Hotel')
 // CORS Configuration
 app.use(cors())
 
 // Mount Routes (after CORS)
 app.use('/auth', AuthRouter)
 app.use('/Place', Place)
+app.use('/Hotel', Hotel)
 
 // Start server
 app.listen(PORT, () => {
