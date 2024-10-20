@@ -19,4 +19,7 @@ router.delete(
   reviewsController.reviews_delete
 )
 
+//get
+router.get('/view', reviewsController.reviews_view_get)
+
 module.exports = router

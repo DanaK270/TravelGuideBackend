@@ -27,3 +27,14 @@ exports.reviews_delete = async (req, res) => {
     res.status(500).send('Error deleting review')
   }
 }
+
+//get
+exports.reviews_view_get = async (req, res) => {
+  try {
+    const dbResponse = await Review.find()
+    res.json(dbResponse)
+  } catch (error) {
+    console.error(error)
+    res.status(500).send('Error fetching theme reviews')
+  }
+}
