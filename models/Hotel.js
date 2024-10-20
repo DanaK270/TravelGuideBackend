@@ -8,7 +8,7 @@ const hotelSchema = mongoose.Schema({
   location: String,
   image: String,
   country: { type: mongoose.Schema.Types.ObjectId, ref: 'Country' },
-  // ratings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Rating' }],
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
   link: String
 })
 
