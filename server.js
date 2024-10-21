@@ -7,14 +7,12 @@ const path = require('path');
 require('dotenv').config();
 
 const Message = require('./models/Message'); // Import Message model
-require('./config/db'); // Ensure your DB is connected
+require('./config/db'); // Ensure MongoDB is connected
 
 const PORT = process.env.PORT || 4000;
 const app = express();
 const server = http.createServer(app); // Create HTTP server
-const io = new Server(server, {
-  cors: { origin: '*' }, // Allow all origins for development
-});
+const io = new Server(server, { cors: { origin: '*' } }); // Enable CORS
 
 // Middleware
 app.use(express.json());
@@ -22,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use('/images', express.static(path.join(__dirname, '/public/images')));
 
-// Routes (example)
+// Routes (examples)
 const AuthRouter = require('./routes/AuthRouter');
 const Place = require('./routes/Place');
 const Hotel = require('./routes/Hotel');
@@ -35,21 +33,24 @@ app.use('/Hotel', Hotel);
 app.use('/review', ReviewRouter);
 app.use('/country', CountryRouter);
 
-// Socket.IO setup
+// Socket.IO Setup
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('A user connected.');
 
-  // Send previous messages to newly connected users
+  // Send previous messages to the connected user
   Message.find()
     .sort({ createdAt: 1 })
     .populate('user', 'name')
     .then((messages) => {
+      console.log('Sending previous messages:', messages);
       socket.emit('previousMessages', messages);
-    });
+    })
+    .catch((err) => console.error('Error loading messages:', err));
 
-  // Handle incoming messages from clients
+  // Listen for new messages from clients
   socket.on('message', async (msg) => {
-    console.log('Received message:', msg); // Log incoming message
+    console.log('Received message:', msg);
+
     try {
       const newMessage = new Message({
         content: msg.content,
@@ -59,16 +60,15 @@ io.on('connection', (socket) => {
       const savedMessage = await newMessage.save();
       const populatedMessage = await savedMessage.populate('user', 'name');
 
-      console.log('Saved message:', populatedMessage); // Log saved message
+      console.log('Saved message:', populatedMessage);
       io.emit('message', populatedMessage); // Broadcast to all clients
     } catch (error) {
       console.error('Error saving message:', error);
     }
   });
 
-  // Handle user disconnection
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('A user disconnected.');
   });
 });
 
