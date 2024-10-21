@@ -1,7 +1,9 @@
 const { Review } = require('../models/Review')
+const { Hotel } = require('../models/Hotel')
+const { Place } = require('../models/Place')
 
 //create
-exports.reviews_add_post = (req, res) => {
+exports.reviews_add_post = async (req, res) => {
   // Save this data to a database probably
   console.log('CREATE: ', req.body)
   console.log('CREATE: ', res.locals.payload.id)
@@ -9,6 +11,22 @@ exports.reviews_add_post = (req, res) => {
   try {
     let review = new Review({ ...req.body, user: res.locals.payload.id })
     review.save()
+
+    // Find the relevant hotel or place and update its reviews array
+    if (req.body.hotel) {
+      let hotelObj = await Hotel.findById(req.body.hotel)
+      if (hotelObj) {
+        hotelObj.reviews.push(review._id) // Add the new hotel's ID to the hotel's hotels array
+        await hotelObj.save() // Save the updated hotel
+      }
+    } else {
+      let placeObj = await Place.findById(req.body.place)
+      if (placeObj) {
+        placeObj.reviews.push(review._id)
+        await placeObj.save()
+      }
+    }
+
     res.send(review)
   } catch (error) {
     console.error('Error adding review:', error)
