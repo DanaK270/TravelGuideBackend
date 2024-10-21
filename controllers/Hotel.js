@@ -1,6 +1,5 @@
 const { Hotel } = require('../models/Hotel')
 const { Country } = require('../models/Country')
-const { populate } = require('dotenv')
 
 const GetHotel = async (req, res) => {
   try {
