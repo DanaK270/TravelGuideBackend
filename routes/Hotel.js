@@ -11,6 +11,7 @@ const hotelCtrl = require('../controllers/Hotel')
 
 //routes
 router.get('/', hotelCtrl.GetHotel)
+router.get('/:hotel_id', hotelCtrl.GetHotelById)
 router.post('/', upload.single('image'), hotelCtrl.CreateHotelPost)
 router.put('/:hotel_id', upload.single('image'), hotelCtrl.UpdateHotel)
 router.delete('/:hotel_id', hotelCtrl.DeleteHotel)

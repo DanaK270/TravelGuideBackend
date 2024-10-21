@@ -1,9 +1,25 @@
 const { Hotel } = require('../models/Hotel')
 const { Country } = require('../models/Country')
+const { populate } = require('dotenv')
 
 const GetHotel = async (req, res) => {
   try {
     const hotel = await Hotel.find()
+    res.send(hotel)
+  } catch (error) {
+    throw error
+  }
+}
+
+const GetHotelById = async (req, res) => {
+  try {
+    const hotel = await Hotel.findById(req.params.hotel_id)
+      .populate('country')
+      .populate('reviews')
+
+    if (!hotel) {
+      return res.status(404).send('Hotel not found')
+    }
     res.send(hotel)
   } catch (error) {
     throw error
@@ -102,5 +118,6 @@ module.exports = {
   GetHotel,
   CreateHotelPost,
   UpdateHotel,
-  DeleteHotel
+  DeleteHotel,
+  GetHotelById
 }
