@@ -10,6 +10,21 @@ const GetHotel = async (req, res) => {
   }
 }
 
+const GetHotelById = async (req, res) => {
+  try {
+    const hotel = await Hotel.findById(req.params.hotel_id)
+      .populate('country')
+      .populate('reviews')
+
+    if (!hotel) {
+      return res.status(404).send('Hotel not found')
+    }
+    res.send(hotel)
+  } catch (error) {
+    throw error
+  }
+}
+
 const CreateHotelPost = async (req, res) => {
   console.log(' CREATE: ', req.body)
   console.log(req.file)
@@ -102,5 +117,6 @@ module.exports = {
   GetHotel,
   CreateHotelPost,
   UpdateHotel,
-  DeleteHotel
+  DeleteHotel,
+  GetHotelById
 }
