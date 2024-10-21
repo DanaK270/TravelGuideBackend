@@ -2,7 +2,6 @@ const { Country } = require('../models/Country')
 
 exports.countries_view_get = async (req, res) => {
   try {
-
     const dbResponse = await Country.find()
     const countries = [...dbResponse.data, ...dbResponse]
     res.json(countries)
@@ -14,7 +13,6 @@ exports.countries_view_get = async (req, res) => {
 }
 //add
 exports.countries_add_post = (req, res) => {
-
   console.log('BOOK CREATE: ', req.body)
   // console.log(req.file)
   try {
@@ -40,17 +38,16 @@ exports.countries_add_post = (req, res) => {
 //   });
 // };
 
-
 //read
 exports.country_index_get = (req, res) => {
   Country.find()
-  .then(countries => {
-      res.render("country/index", { countries: countries});
-  })
-  .catch(err => {
-    console.log(err);
-  });
-};
+    .then((countries) => {
+      res.render('country/index', { countries: countries })
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+}
 
 //delete
 exports.countries_delete = async (req, res) => {
