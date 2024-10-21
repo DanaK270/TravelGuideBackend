@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose")
 
 const hotelSchema = mongoose.Schema({
   name: {
@@ -12,5 +12,5 @@ const hotelSchema = mongoose.Schema({
   link: String
 })
 
-const Hotel = mongoose.model('Hotel', hotelSchema)
+const Hotel = mongoose.model("Hotel", hotelSchema)
 module.exports = { Hotel }

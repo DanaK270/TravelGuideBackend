@@ -1,10 +1,7 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const placeSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
+const placeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
   description: String,
   location: String,
   image: String,
@@ -13,5 +10,5 @@ const placeSchema = mongoose.Schema({
   link: String
 })
 
-const Place = mongoose.model('Place', placeSchema)
-module.exports = { Place }
+const Place = mongoose.model('Place', placeSchema);
+module.exports = { Place };
