@@ -1,10 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const socketIO = require('socket.io');
-const BlogRouter = require('./routes/blog');
+// const BlogRouter = require('./routes/blog');
 const FlightRouter = require('./routes/Flight');
-const ChatRouter = require('./routes/chats');
+// const ChatRouter = require('./routes/chats');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 4000;
@@ -23,8 +22,8 @@ const AuthRouter = require('./routes/AuthRouter');
 const PlaceRouter = require('./routes/Place');
 const HotelRouter = require('./routes/Hotel');
 const ReviewRouter = require('./routes/review');
-const BlogRouter = require('./routes/blogs');
-const ChatRouter = require('./routes/chats');
+const BlogRouter = require('./routes/blog');
+const ChatRouter = require('./routes/chat');
 
 // Mount Routes
 app.use('/auth', AuthRouter);
