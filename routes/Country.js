@@ -1,7 +1,12 @@
 const express = require('express')
-const { getCountries } = require('../controllers/country')
 const router = express.Router()
 
-router.get('/', getCountries)
+//controller
+const countryCtrl = require('../controllers/country')
+
+router.get('/', countryCtrl.getCountries)
+router.post('/', countryCtrl.createCountryPost)
+
+router.delete('/:country_id', countryCtrl.deleteCountry)
 
 module.exports = router
