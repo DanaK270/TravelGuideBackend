@@ -10,6 +10,21 @@ const GetPlace = async (req, res) => {
   }
 }
 
+const GetPlaceById = async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.place_id)
+      .populate('country')
+      .populate('reviews')
+
+    if (!place) {
+      return res.status(404).send('Place not found')
+    }
+    res.send(place)
+  } catch (error) {
+    throw error
+  }
+}
+
 const CreatePlace = async (req, res) => {
   console.log(' CREATE: ', req.body)
   console.log(req.file)
@@ -102,5 +117,6 @@ module.exports = {
   GetPlace,
   CreatePlace,
   UpdatePlace,
-  DeletePlace
+  DeletePlace,
+  GetPlaceById
 }

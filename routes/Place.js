@@ -11,6 +11,7 @@ const placeCtrl = require('../controllers/Place')
 
 //routes
 router.get('/', placeCtrl.GetPlace)
+router.get('/:place_id', placeCtrl.GetPlaceById)
 router.post('/', upload.single('image'), placeCtrl.CreatePlace)
 router.put('/:place_id', upload.single('image'), placeCtrl.UpdatePlace)
 router.delete('/:place_id', placeCtrl.DeletePlace)
