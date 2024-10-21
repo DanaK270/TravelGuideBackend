@@ -2,10 +2,8 @@ const { Country } = require('../models/Country')
 
 const getCountries = async (req, res) => {
   try {
-    // Fetch all countries from the database
     const countries = await Country.find()
 
-    // Send the list of countries as a response
     res.send(countries)
   } catch (error) {
     console.error('Error fetching countries:', error)
@@ -13,4 +11,26 @@ const getCountries = async (req, res) => {
   }
 }
 
-module.exports = { getCountries }
+const createCountryPost = async (req, res) => {
+  console.log(' CREATE: ', req.body)
+  // console.log(req.file)
+  try {
+    // const imageName = req.file.filename
+    let countryData = {
+      ...req.body
+      // image: imageName
+    }
+    let country = new Country(countryData)
+    country.save()
+    res.send(country)
+  } catch (error) {
+    throw error
+  }
+}
+
+module.exports = {
+  getCountries,
+  createCountryPost
+  // updateCountry,
+  // deleteCountry
+}
