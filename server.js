@@ -1,65 +1,41 @@
-const express = require('express');
-const cors = require('cors');
-const socketIO = require('socket.io');
-// const BlogRouter = require('./routes/blog');
-const FlightRouter = require('./routes/Flight');
-// const ChatRouter = require('./routes/chats');
-require('dotenv').config();
+const express = require('express')
+const mongoose = require('mongoose')
+const cors = require('cors')
+require('dotenv').config()
+const path = require('path')
 
-const PORT = process.env.PORT || 4000;
-const app = express();
+// PORT Configuration
+const PORT = process.env.PORT
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+// Initialize Express
+const app = express()
 
-// Database Connection
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+
+app.use(cors())
+app.use('/images', express.static(path.join(__dirname, '/public/images')))
+
 const db = require('./config/db')
 
 // Import Routes
-const AuthRouter = require('./routes/AuthRouter');
-const PlaceRouter = require('./routes/Place');
-const HotelRouter = require('./routes/Hotel');
-const ReviewRouter = require('./routes/review');
-const BlogRouter = require('./routes/blog');
-const ChatRouter = require('./routes/chat');
+const AuthRouter = require('./routes/AuthRouter')
+const Place = require('./routes/Place')
+const Hotel = require('./routes/Hotel')
+const ReviewRouter = require('./routes/review')
+const CountryRouter = require('./routes/Country')
 
-// Mount Routes
-app.use('/auth', AuthRouter);
-app.use('/place', PlaceRouter);
-app.use('/hotel', HotelRouter);
-app.use('/review', ReviewRouter);
-app.use('/blogs', BlogRouter);
-app.use('/chats', ChatRouter);
-app.use('/flight', FlightRouter);
-app.use('/blogs', BlogRouter);
-app.use('/chats', ChatRouter);
+// CORS Configuration
+app.use(cors())
 
-const server = app.listen(PORT, () => {
-  console.log(`App is running on PORT ${PORT}`);
-});
+// Mount Routes (after CORS)
+app.use('/auth', AuthRouter)
+app.use('/Place', Place)
+app.use('/Hotel', Hotel)
+app.use('/review', ReviewRouter)
+app.use('/country', CountryRouter)
 
-// Socket.IO for real-time chat
-const io = socketIO(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  },
-});
-
-io.on('connection', (socket) => {
-  console.log('New client connected');
-
-  socket.on('message', async (msg) => {
-    const Message = require('./models/Message');
-    const message = new Message({ content: msg.content, user: msg.userId });
-    await message.save();
-
-    io.emit('message', message);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
+// Start server
+app.listen(PORT, () => {
+  console.log(`App is running on PORT ${PORT}`)
+})
