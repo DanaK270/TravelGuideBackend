@@ -24,6 +24,7 @@ const Place = require('./routes/Place')
 const Hotel = require('./routes/Hotel')
 const ReviewRouter = require('./routes/review')
 const CountryRouter = require('./routes/Country')
+const Country = require('./routes/CountryRouter')
 
 // CORS Configuration
 app.use(cors())
@@ -34,6 +35,7 @@ app.use('/Place', Place)
 app.use('/Hotel', Hotel)
 app.use('/review', ReviewRouter)
 app.use('/country', CountryRouter)
+app.use('/CountryRouter', Country)
 
 // Start server
 app.listen(PORT, () => {

@@ -4,8 +4,9 @@ const router = require('express').Router()
 const countryCtrl = require('../controllers/CountryController')
 
 //routes
-router.get('/view', countryCtrl.countries_view_get)
-router.post('/addCountry', countryCtrl.countries_add_post)
-router.get('/delete/:id', countryCtrl.countries_delete)
+router.get('/', countryCtrl.GetCountry)
+router.post('/', countryCtrl.CreateCountryPost)
+router.put('/:country_id', countryCtrl.UpdateCountry)
+router.delete('/:country_id', countryCtrl.DeleteCountry)
 
 module.exports = router
