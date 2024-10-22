@@ -26,39 +26,6 @@ const Register = async (req, res) => {
       role: role || 'user' // Default role is 'user'
     })
 
-    // to send welcome email
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    })
-
-    transporter.verify(function (error, success) {
-      if (error) {
-        console.log(error)
-      } else {
-        console.log('Server is ready to take our messages')
-      }
-    })
-
-    try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: 'Welcome To TravelTrvove!',
-        text: 'text',
-        html: '<b>Hello world?</b>'
-      })
-    } catch (emailError) {
-      console.error('Error sending email:', emailError)
-      return res
-        .status(500)
-        .send({ status: 'Error', msg: 'Email sending failed!' })
-    }
-
     res.status(201).send(user) // Send newly created user as response
   } catch (error) {
     console.error(error)
@@ -91,10 +58,10 @@ const Login = async (req, res) => {
       }
 
       // Create access and refresh tokens
-      // let accessToken = middleware.createToken(payload) // 1-hour access token
-      // let refreshToken = middleware.createRefreshToken(payload) // 7-day refresh token
+      let accessToken = middleware.createToken(payload) // 1-hour access token
+      let refreshToken = middleware.createRefreshToken(payload) // 7-day refresh token
 
-      return res.send({ user: payload /*, accessToken, refreshToken */ }) // Send tokens
+      return res.send({ user: payload, accessToken, refreshToken }) // Send tokens
     }
 
     res.status(401).send({ status: 'Error', msg: 'Unauthorized' })
