@@ -7,6 +7,6 @@ const countryCtrl = require('../controllers/country')
 router.get('/', countryCtrl.getCountries)
 router.post('/', countryCtrl.createCountryPost)
 
+router.get('/:country_id', countryCtrl.GetCountryById)
 router.delete('/:country_id', countryCtrl.deleteCountry)
-
 module.exports = router

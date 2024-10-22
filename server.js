@@ -26,12 +26,13 @@ const Place = require('./routes/Place');
 const Hotel = require('./routes/Hotel');
 const ReviewRouter = require('./routes/review');
 const CountryRouter = require('./routes/Country');
+const { Country } = require('./models/Country');
 
 app.use('/auth', AuthRouter);
 app.use('/Place', Place);
 app.use('/Hotel', Hotel);
 app.use('/review', ReviewRouter);
-app.use('/country', CountryRouter);
+app.use('/country', Country);
 
 // Socket.IO Setup
 io.on('connection', (socket) => {
@@ -42,7 +43,7 @@ io.on('connection', (socket) => {
     .sort({ createdAt: 1 })
     .populate('user', 'name')
     .then((messages) => {
-      console.log('Sending previous messages:', messages);
+      console.log('Sending previ, ous messages:', messages);
       socket.emit('previousMessages', messages);
     })
     .catch((err) => console.error('Error loading messages:', err));

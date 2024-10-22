@@ -38,8 +38,25 @@ const deleteCountry = async (req, res) => {
   }
 }
 
+const GetCountryById = async (req, res) => {  
+  console.log(req.params.country_id, 'checking the country id')
+
+  try {
+    const country = await Country.findById(req.params.country_id)
+      .populate('hotels')
+      .populate('places')
+    if (!country) {
+      return res.status(404).send('Country not found')
+    }
+    res.send(country)
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   getCountries,
   createCountryPost,
-  deleteCountry
+  deleteCountry,
+  GetCountryById
 }
