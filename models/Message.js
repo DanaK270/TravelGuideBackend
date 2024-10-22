@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema(
   {
-    content: { type: String, required: true },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    content: { type: String, required: true }, // Content must be provided
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Valid User reference
   },
-  { timestamps: true } // Automatically add `createdAt` and `updatedAt` fields
+  { timestamps: true } // Adds `createdAt` and `updatedAt` automatically
 );
 
 const Message = mongoose.model('Message', messageSchema);
 
-module.exports = Message; // Export the model correctly
+module.exports = Message;
