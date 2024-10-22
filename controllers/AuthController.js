@@ -1,123 +1,118 @@
-const { User } = require('../models/User')
-const middleware = require('../middleware')
+const { User } = require('../models/User');
+const middleware = require('../middleware');
 
+// Register a new user
 const Register = async (req, res) => {
   try {
-    // Extracts the necessary fields from the request body
-    const { email, password, name, role } = req.body
-    // Hashes the provided password
-    let passwordDigest = await middleware.hashPassword(password)
-    // Checks if there has already been a user registered with that email
-    let existingUser = await User.findOne({ email })
+    const { email, password, name, role } = req.body;
 
+    // Check if user already exists
+    let existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res
-        .status(400)
-        .send('A user with that email has already been registered!')
-    } else {
-      // Creates a new user
-      const user = await User.create({
-        name,
-        email,
-        passwordDigest,
-        role: role || 'user'
-      })
-      // Sends the user as a response
-      res.send(user)
+      return res.status(400).send('A user with that email has already been registered!');
     }
-  } catch (error) {
-    throw error
-  }
-}
 
+    // Hash the password
+    let passwordDigest = await middleware.hashPassword(password);
+
+    // Create a new user
+    const user = await User.create({
+      name,
+      email,
+      passwordDigest,
+      role: role || 'user', // Default role is 'user'
+    });
+
+    res.status(201).send(user); // Send newly created user as response
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ status: 'Error', msg: 'Registration failed!' });
+  }
+};
+
+// Login an existing user
 const Login = async (req, res) => {
   try {
-    // Extracts the necessary fields from the request body
-    const { email, password } = req.body
-    // Finds a user by a particular field (in this case, email)
-    const user = await User.findOne({ email })
+    const { email, password } = req.body;
 
+    // Find user by email
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).send('User does not exist!')
+      return res.status(401).send('User does not exist!');
     }
 
-    // Checks if the password matches the stored digest
-    let matched = await middleware.comparePassword(
-      user.passwordDigest,
-      password
-    )
-    // If they match, constructs a payload object of values we want on the front end
+    // Compare the provided password with the stored password digest
+    let matched = await middleware.comparePassword(user.passwordDigest, password);
     if (matched) {
+      // Create payload and JWT token if passwords match
       let payload = {
         id: user.id,
         email: user.email,
-        role: user.role
-      }
-      // Creates our JWT and packages it with our payload to send as a response
-      let token = middleware.createToken(payload)
-      return res.send({ user: payload, token })
-    }
-    res.status(401).send({ status: 'Error', msg: 'Unauthorized' })
-  } catch (error) {
-    console.log(error)
-    res.status(401).send({ status: 'Error', msg: 'An error has occurred!' })
-  }
-}
+        role: user.role,
+      };
+      let token = middleware.createToken(payload);
 
+      return res.send({ user: payload, token });
+    }
+
+    res.status(401).send({ status: 'Error', msg: 'Unauthorized' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ status: 'Error', msg: 'Login failed!' });
+  }
+};
+
+// Update the user's password
 const UpdatePassword = async (req, res) => {
   try {
-    // Extracts the necessary fields from the request body
-    const { oldPassword, newPassword } = req.body
-    // Finds a user by a particular field (in this case, the user's id from the URL param)
-    let user = await User.findById(req.params.user_id)
-    // Checks if the password matches the stored digest
-    let matched = await middleware.comparePassword(
-      user.passwordDigest,
-      oldPassword
-    )
-    // If they match, hashes the new password, updates the db with the new digest, then sends the user as a response
-    if (matched) {
-      let passwordDigest = await middleware.hashPassword(newPassword)
-      user = await User.findByIdAndUpdate(req.params.user_id, {
-        passwordDigest
-      })
-      let payload = {
-        id: user.id,
-        email: user.email
-      }
-      return res.send({ status: 'Password Updated!', user: payload })
+    const { oldPassword, newPassword } = req.body;
+
+    // Find the user by ID
+    let user = await User.findById(req.params.user_id);
+    if (!user) {
+      return res.status(404).send({ status: 'Error', msg: 'User not found!' });
     }
-    res
-      .status(401)
-      .send({ status: 'Error', msg: 'Old Password did not match!' })
+
+    // Compare the provided old password with the stored password digest
+    let matched = await middleware.comparePassword(user.passwordDigest, oldPassword);
+    if (matched) {
+      // Hash the new password and update the user in the database
+      let passwordDigest = await middleware.hashPassword(newPassword);
+      await User.findByIdAndUpdate(req.params.user_id, { passwordDigest });
+
+      let payload = { id: user.id, email: user.email };
+
+      return res.send({ status: 'Password Updated!', user: payload });
+    }
+
+    res.status(401).send({ status: 'Error', msg: 'Old Password did not match!' });
   } catch (error) {
-    console.log(error)
-    res.status(401).send({
-      status: 'Error',
-      msg: 'An error has occurred updating password!'
-    })
+    console.error(error);
+    res.status(500).send({ status: 'Error', msg: 'Password update failed!' });
   }
-}
+};
 
+// Check the current user's session
 const CheckSession = async (req, res) => {
-  const { payload } = res.locals
-  res.send(payload)
-}
+  const { payload } = res.locals;
+  res.send(payload); // Send the decoded JWT payload
+};
 
-// to check if the user is admin to be used on routes that require admin access only
+// Verify if the user has admin privileges
 const verifyAdmin = (req, res, next) => {
-  const { role } = res.locals.payload
+  const { role } = res.locals.payload;
 
   if (role === 'admin') {
-    return next() // Alow if admin
+    return next(); // Allow if the user is an admin
   }
-  res.status(403).send({ status: 'Error', msg: 'Forbidden: Admins only' }) // Block if not admin
-}
+
+  res.status(403).send({ status: 'Error', msg: 'Forbidden: Admins only' }); // Block if not an admin
+};
 
 module.exports = {
   Register,
   Login,
   UpdatePassword,
   CheckSession,
-  verifyAdmin
-}
+  verifyAdmin,
+};
