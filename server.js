@@ -11,7 +11,7 @@ require('./config/db'); // Ensure MongoDB is connected
 
 const PORT = process.env.PORT || 4000;
 const app = express();
-const server = http.createServer(app); // Create HTTP server
+const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } }); // Enable CORS
 
 // Middleware
@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use('/images', express.static(path.join(__dirname, '/public/images')));
 
-// Routes (examples)
+// Routes
 const AuthRouter = require('./routes/AuthRouter');
 const Place = require('./routes/Place');
 const Hotel = require('./routes/Hotel');
@@ -52,18 +52,26 @@ io.on('connection', (socket) => {
     console.log('Received message:', msg);
 
     try {
+      // Check if user ID is valid
+      if (!mongoose.Types.ObjectId.isValid(msg.user)) {
+        console.error('Invalid user ID:', msg.user);
+        socket.emit('error', 'Invalid user ID. Please log in again.');
+        return; // Stop if the userId is invalid
+      }
+
       const newMessage = new Message({
         content: msg.content,
-        user: mongoose.Types.ObjectId(msg.user),
+        user: mongoose.Types.ObjectId(msg.user), // Ensure ObjectId conversion
       });
 
       const savedMessage = await newMessage.save();
       const populatedMessage = await savedMessage.populate('user', 'name');
 
       console.log('Saved message:', populatedMessage);
-      io.emit('message', populatedMessage); // Broadcast to all clients
+      io.emit('message', populatedMessage); // Broadcast the message to all clients
     } catch (error) {
       console.error('Error saving message:', error);
+      socket.emit('error', 'Message could not be saved.');
     }
   });
 
@@ -72,7 +80,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Start server
+// Start the server
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
