@@ -1,16 +1,14 @@
-// Load Dependency
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-// MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    // console.log("MongoDB Connected");
-    const db = mongoose.connection
-    console.log(
-      `MongoDB Connected to Database: ${db.name} at Host: ${db.host} on Port: ${db.port}`
-    )
-  })
-  .catch((err) => {
-    console.log('MongoDB not connected' + err)
-  })
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log(`MongoDB connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1); // Exit process with failure
+  }
+};
+
+module.exports = connectDB;

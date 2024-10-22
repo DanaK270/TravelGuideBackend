@@ -1,74 +1,81 @@
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-require('dotenv').config()
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS)
-const APP_SECRET = process.env.APP_SECRET
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10; // Default to 10 if not in .env
+const APP_SECRET = process.env.APP_SECRET;
 
+// Hash a password with bcrypt
 const hashPassword = async (password) => {
-  // Accepts a password from the request body
-  let hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
-  // Creates a hashed password and encrypts it 12 times
-  return hashedPassword
-}
+  try {
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    return hashedPassword;
+  } catch (error) {
+    console.error('Error hashing password:', error);
+    throw new Error('Hashing failed.');
+  }
+};
 
+// Compare a plain text password with a hashed password
 const comparePassword = async (storedPassword, password) => {
-  // Accepts the password provided in the login request and the currently stored password
-  // Compares the two passwords for a match
-  let passwordMatch = await bcrypt.compare(password, storedPassword)
-  // Returns true if the passwords match
-  // Returns false if the passwords are not a match
-  return passwordMatch
-}
+  try {
+    const passwordMatch = await bcrypt.compare(password, storedPassword);
+    return passwordMatch;
+  } catch (error) {
+    console.error('Error comparing passwords:', error);
+    throw new Error('Password comparison failed.');
+  }
+};
 
+// Create a JWT token with a 1-hour expiration
 const createToken = (payload) => {
-  // Accepts a payload with which to create the token
-  let token = jwt.sign(payload, APP_SECRET)
-  // Generates the token and encrypts it, returns the token when the process finishes
-  return token
-}
+  try {
+    const token = jwt.sign(payload, APP_SECRET, { expiresIn: '1h' });
+    return token;
+  } catch (error) {
+    console.error('Error creating token:', error);
+    throw new Error('Token creation failed.');
+  }
+};
 
+// Extract the token from the Authorization header
 const stripToken = (req, res, next) => {
   try {
-    const token = req.headers['authorization']?.split(' ')[1]
-    // Gets the token from the request headers {authorization: Bearer Some-Token}
-    // Splits the value of the authorization header
+    const token = req.headers['authorization']?.split(' ')[1]; // Bearer <token>
     if (token) {
-      console.log('Token found:', token)
-      res.locals.token = token
-      // If the token exists we add it to the request lifecycle state
-      return next()
+      res.locals.token = token;
+      return next();
     }
-    res.status(401).send({ status: 'Error', msg: 'Unauthorized' })
+    res.status(401).send({ status: 'Error', msg: 'Unauthorized: No token provided' });
   } catch (error) {
-    console.log(error)
-    res.status(401).send({ status: 'Error', msg: 'Strip Token Error!' })
+    console.error('Error stripping token:', error);
+    res.status(401).send({ status: 'Error', msg: 'Strip Token Error' });
   }
-}
+};
 
+// Verify the extracted token and decode the payload
 const verifyToken = (req, res, next) => {
-  const { token } = res.locals
-  // Gets the token stored in the request lifecycle state
+  const { token } = res.locals;
   try {
-    let payload = jwt.verify(token, APP_SECRET)
-    // Verifies the token is legit
-    if (payload) {
-      console.log('Payload:', payload)
-      res.locals.payload = payload // Passes the decoded payload to the next function
-      // Calls the next function if the token is valid
-      return next()
-    }
-    res.status(401).send({ status: 'Error', msg: 'Unauthorized' })
+    const payload = jwt.verify(token, APP_SECRET);
+    res.locals.payload = payload;
+    return next(); // Token is valid, proceed to the next middleware or route handler
   } catch (error) {
-    console.log(error)
-    res.status(401).send({ status: 'Error', msg: 'Verify Token Error!' })
+    console.error('Token verification error:', error);
+    if (error.name === 'TokenExpiredError') {
+      res.status(401).send({ status: 'Error', msg: 'Token Expired' });
+    } else if (error.name === 'JsonWebTokenError') {
+      res.status(401).send({ status: 'Error', msg: 'Invalid Token' });
+    } else {
+      res.status(401).send({ status: 'Error', msg: 'Unauthorized Access' });
+    }
   }
-}
+};
 
 module.exports = {
   hashPassword,
   comparePassword,
   createToken,
   stripToken,
-  verifyToken
-}
+  verifyToken,
+};
