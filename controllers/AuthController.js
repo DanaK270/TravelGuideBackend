@@ -1,4 +1,4 @@
-const { User } = require('../models/User');
+const User = require('../models/User'); // Correct import of User model
 const middleware = require('../middleware');
 
 // Register a new user
@@ -30,7 +30,7 @@ const Register = async (req, res) => {
   }
 };
 
-// Login an existing user
+// Login an existing user and issue both access and refresh tokens
 const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -44,15 +44,18 @@ const Login = async (req, res) => {
     // Compare the provided password with the stored password digest
     let matched = await middleware.comparePassword(user.passwordDigest, password);
     if (matched) {
-      // Create payload and JWT token if passwords match
+      // Create payload for tokens
       let payload = {
         id: user.id,
         email: user.email,
         role: user.role,
       };
-      let token = middleware.createToken(payload);
 
-      return res.send({ user: payload, token });
+      // Create access and refresh tokens
+      let accessToken = middleware.createToken(payload); // 1-hour access token
+      let refreshToken = middleware.createRefreshToken(payload); // 7-day refresh token
+
+      return res.send({ user: payload, accessToken, refreshToken }); // Send tokens
     }
 
     res.status(401).send({ status: 'Error', msg: 'Unauthorized' });
@@ -98,6 +101,21 @@ const CheckSession = async (req, res) => {
   res.send(payload); // Send the decoded JWT payload
 };
 
+// Refresh access token using refresh token
+const RefreshToken = (req, res) => {
+  try {
+    const { refreshToken } = req.body; // Get refresh token from request
+
+    const payload = middleware.verifyRefreshToken(refreshToken); // Verify refresh token
+    const newAccessToken = middleware.createToken(payload); // Issue new access token
+
+    res.send({ accessToken: newAccessToken }); // Send new access token
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    res.status(401).send({ status: 'Error', msg: 'Invalid Refresh Token' });
+  }
+};
+
 // Verify if the user has admin privileges
 const verifyAdmin = (req, res, next) => {
   const { role } = res.locals.payload;
@@ -114,5 +132,6 @@ module.exports = {
   Login,
   UpdatePassword,
   CheckSession,
+  RefreshToken, // Export the new RefreshToken method
   verifyAdmin,
 };
