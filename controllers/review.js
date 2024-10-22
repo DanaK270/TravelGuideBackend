@@ -38,8 +38,13 @@ exports.reviews_add_post = async (req, res) => {
 exports.reviews_delete = async (req, res) => {
   const { id } = req.params
   try {
-    await Review.findByIdAndDelete(id)
-    res.status(200).send('Review deleted successfully')
+    const rev = await Review.findById(id)
+    if (rev.user != res.locals.payload.id) {
+      res.status(401).send('you are not allowed to delete this review')
+    } else {
+      await Review.findByIdAndDelete(id)
+      res.status(200).send('Review deleted successfully')
+    }
   } catch (error) {
     console.error(error)
     res.status(500).send('Error deleting review')
