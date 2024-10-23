@@ -5,10 +5,6 @@ const countrySchema = mongoose.Schema({
     type: String,
     required: true
   },
-  continent: {
-    type: String,
-    required: true
-  },
   places: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Place' }],
   hotels: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' }]
 })
