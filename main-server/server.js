@@ -28,6 +28,7 @@ connectDB()
     const CountryRouter = require('../routes/Country')
     const Profile = require('../routes/Profile')
     const Bookmark = require('../routes/bookmark')
+    const Blogs = require('../routes/blog')
 
     // Use routes
     app.use('/auth', AuthRouter)
@@ -37,6 +38,7 @@ connectDB()
     app.use('/country', CountryRouter)
     app.use('/Profile', Profile)
     app.use('/bookmark', Bookmark)
+    app.use('/blogs', Blogs)
 
     // Start the server
     app.listen(PORT, () => {
