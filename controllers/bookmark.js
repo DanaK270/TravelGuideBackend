@@ -2,10 +2,9 @@ const { Bookmark } = require('../models/Bookmark')
 
 const getBookmark = async (req, res) => {
   try {
-    const bookmarks = await Bookmark.find()
+    const bookmarks = await Bookmark.find({ user: req.params.user_id })
       .populate('hotel')
       .populate('place')
-      .populate('user')
 
     res.send(bookmarks)
   } catch (error) {
