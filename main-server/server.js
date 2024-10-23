@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors')
+const logger = require('morgan')
 const path = require('path')
 require('dotenv').config()
 
@@ -16,6 +17,7 @@ connectDB()
     // Middleware
     app.use(express.json())
     app.use(cors())
+    app.use(logger('dev'))
     app.use('/images', express.static(path.join(__dirname, '../public/images')))
 
     // Routes

@@ -12,5 +12,6 @@ const ProfileCtrl = require('../controllers/Profile')
 //routes
 router.get('/:user_id', ProfileCtrl.GetUserById)
 router.put('/update/:user_id', ProfileCtrl.UpdateUser)
-
+router.get('/users', ProfileCtrl.GetUsersById)
+router.put('/updateusers/:user_id', ProfileCtrl.UpdateUsers)
 module.exports = router
