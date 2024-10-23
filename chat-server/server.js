@@ -11,7 +11,6 @@ const PORT = process.env.CHAT_PORT || 5000;
 // Ensure MongoDB connection before starting the server
 connectDB().then(() => {
   console.log('Connected to MongoDB for Chat Server');
-
   const server = http.createServer();
   const io = new Server(server, { cors: { origin: '*' } }); // Enable CORS
 
