@@ -1,6 +1,5 @@
 const User = require('../models/User') // Correct import of User model
 const middleware = require('../middleware')
-const nodemailer = require('nodemailer')
 
 // Register a new user
 const Register = async (req, res) => {
@@ -54,7 +53,8 @@ const Login = async (req, res) => {
       let payload = {
         id: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        name: user.name
       }
 
       // Create access and refresh tokens
