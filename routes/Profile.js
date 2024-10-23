@@ -10,8 +10,8 @@ router.use(express.urlencoded({ extended: true }))
 const ProfileCtrl = require('../controllers/Profile')
 
 //routes
+router.get('/users', ProfileCtrl.GetUsers)
 router.get('/:user_id', ProfileCtrl.GetUserById)
 router.put('/update/:user_id', ProfileCtrl.UpdateUser)
-router.get('/users', ProfileCtrl.GetUsersById)
 router.put('/updateusers/:user_id', ProfileCtrl.UpdateUsers)
 module.exports = router

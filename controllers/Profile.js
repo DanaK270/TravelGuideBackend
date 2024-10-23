@@ -37,13 +37,11 @@ const UpdateUser = async (req, res) => {
   }
 }
 
-const GetUsersById = async (req, res) => {
+const GetUsers = async (req, res) => {
   try {
-    let user = await User.find(req.params.user_id)
-    if (!user) {
-      return res.status(404).send('Users not found')
-    }
-    res.send({ user })
+    let users = await User.find({})
+    console.log(users)
+    res.send(users)
   } catch (error) {
     throw error
   }
@@ -73,6 +71,6 @@ const UpdateUsers = async (req, res) => {
 module.exports = {
   GetUserById,
   UpdateUser,
-  GetUsersById,
+  GetUsers,
   UpdateUsers
 }
