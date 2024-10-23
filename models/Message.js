@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema(
   {
-    content: { type: String, required: true }, // Content must be provided
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Valid User reference
+    content: { type: String, required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    timestamp: { type: Date, default: Date.now },
   },
-  { timestamps: true } // Adds `createdAt` and `updatedAt` automatically
+  { timestamps: true }
 );
 
 const Message = mongoose.model('Message', messageSchema);

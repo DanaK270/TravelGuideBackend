@@ -11,4 +11,8 @@ const connectDB = async () => {
   }
 };
 
+// Ensure models are registered before any queries are executed
+require('../models/User');  // Register the User model
+require('../models/Message'); // Register the Message model
+
 module.exports = connectDB;
